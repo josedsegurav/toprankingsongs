@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  track: one
+  artist: one
+  is_primary: false
+
+two:
+  track: two
+  artist: two
+  is_primary: false

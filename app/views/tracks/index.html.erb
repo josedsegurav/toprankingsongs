@@ -1,0 +1,13 @@
+
+<section class="section">
+  <div class="container">
+    <h1 class="title">Tracks</h1>
+    <div class="columns is-multiline">
+      <% @tracks.each do |track| %>
+        <div class="column is-one-quarter">
+        <%= render partial: "track", locals: { track: track } %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>

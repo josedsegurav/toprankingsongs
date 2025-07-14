@@ -1,0 +1,27 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  spotify_id: MyString
+  duration_ms: 1
+  danceability: 9.99
+  energy: 9.99
+  key: 1
+  mode: 1
+  tempo: 9.99
+  time_signature: 1
+  album: one
+  primary_artist: one
+
+two:
+  name: MyString
+  spotify_id: MyString
+  duration_ms: 1
+  danceability: 9.99
+  energy: 9.99
+  key: 1
+  mode: 1
+  tempo: 9.99
+  time_signature: 1
+  album: two
+  primary_artist: two
