@@ -79,7 +79,7 @@ country_codes.each do |iso_code|
     if country_data
       country = Country.find_or_initialize_by(iso_code: iso_code)
       country.name = country_data[:name]
-      country.geopoint = country_data[:geo_point_2d]
+      country.geopoint = "#{country_data[:geo_point_2d]["lon"]},#{country_data[:geo_point_2d]["lat"]}"
 
       if country.save
         puts "Country saved: #{country.name} (#{iso_code})"

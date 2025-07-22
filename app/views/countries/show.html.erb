@@ -1,0 +1,261 @@
+<section class="section">
+  <div class="container">
+    <!-- Header -->
+    <div class="level">
+      <div class="level-left">
+        <div class="level-item">
+          <div>
+            <h1 class="title">
+              <span class="icon-text">
+                <span class="icon is-large">
+                  <i class="fas fa-flag"></i>
+                </span>
+                <span><%= @country.name %></span>
+              </span>
+            </h1>
+            <h2 class="subtitle">
+              Music Rankings & Statistics
+            </h2>
+          </div>
+        </div>
+      </div>
+      <div class="level-right">
+        <div class="level-item">
+          <%= link_to "← Back to Tracks", tracks_path, class: "button is-light" %>
+        </div>
+      </div>
+    </div>
+
+    <div class="columns">
+      <!-- Left Column: Country Info & Map -->
+      <div class="column is-one-third">
+        <!-- Country Stats Card -->
+        <div class="card mb-5">
+          <div class="card-content">
+            <p class="title is-6 mb-4">
+              <span class="icon-text">
+                <span class="icon">
+                  <i class="fas fa-chart-bar"></i>
+                </span>
+                <span>Country Statistics</span>
+              </span>
+            </p>
+
+            <div class="field">
+              <label class="label is-small">Total Rankings</label>
+              <p class="is-size-5 has-text-weight-semibold has-text-primary">
+                <%= number_with_delimiter(@total_rankings) %>
+              </p>
+            </div>
+
+            <% if @date_range[:from] && @date_range[:to] %>
+              <div class="field">
+                <label class="label is-small">Data Range</label>
+                <p class="is-size-7 has-text-grey">
+                  <%= @date_range[:from].strftime("%b %d, %Y") %> -
+                  <%= @date_range[:to].strftime("%b %d, %Y") %>
+                </p>
+              </div>
+            <% end %>
+          </div>
+        </div>
+
+         <!-- Map Card -->
+        <% if @latitude && @longitude %>
+          <div class="card">
+            <div class="card-content">
+              <p class="title is-6 mb-4">
+                <span class="icon-text">
+                  <span class="icon">
+                    <i class="fas fa-map-marker-alt"></i>
+                  </span>
+                  <span>Location</span>
+                </span>
+              </p>
+
+              <div id="country-map" style="height: 300px; border-radius: 8px;"></div>
+
+              <p class="is-size-7 has-text-grey mt-2">
+                Coordinates: <%= @latitude %>, <%= @longitude %>
+              </p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Right Column: Rankings -->
+      <div class="column is-two-thirds">
+        <!-- Top Tracks Card -->
+        <div class="card mb-5">
+          <div class="card-content">
+            <p class="title is-6 mb-4">
+              <span class="icon-text">
+                <span class="icon">
+                  <i class="fas fa-star"></i>
+                </span>
+                <span>Top Performing Tracks</span>
+              </span>
+            </p>
+
+            <% if @top_tracks.any? %>
+              <div class="table-container">
+                <table class="table is-fullwidth is-hoverable">
+                  <tbody>
+                    <% @top_tracks.each_with_index do |track, index| %>
+                      <tr>
+                        <td style="width: 40px;">
+                          <span class="tag is-primary is-rounded">
+                            #<%= index + 1 %>
+                          </span>
+                        </td>
+                        <td>
+                          <%= link_to track_path(track), class: "has-text-dark" do %>
+                            <strong><%= track.name %></strong><br>
+                            <small class="has-text-grey">
+                              by <%= track.artist.name %>
+                              <% if track.album %>
+                                • <%= track.album.title %>
+                              <% end %>
+                            </small>
+                          <% end %>
+                        </td>
+                      </tr>
+                    <% end %>
+                  </tbody>
+                </table>
+              </div>
+            <% else %>
+              <div class="has-text-centered has-text-grey py-5">
+                <span class="icon is-large">
+                  <i class="fas fa-music"></i>
+                </span>
+                <p>No track data available for this country.</p>
+              </div>
+            <% end %>
+          </div>
+        </div>
+
+        <!-- Recent Rankings Card -->
+        <div class="card">
+          <div class="card-content">
+            <p class="title is-6 mb-4">
+              <span class="icon-text">
+                <span class="icon">
+                  <i class="fas fa-clock"></i>
+                </span>
+                <span>Recent Rankings</span>
+              </span>
+            </p>
+
+            <% if @recent_rankings.any? %>
+              <div class="table-container">
+                <table class="table is-fullwidth is-striped is-hoverable is-size-7">
+                  <thead>
+                    <tr>
+                      <th>Rank</th>
+                      <th>Track</th>
+                      <th>Artist</th>
+                      <th>Popularity</th>
+                      <th>Date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% @recent_rankings.each do |ranking| %>
+                      <tr>
+                        <td>
+                          <span class="tag is-primary is-small">
+                            #<%= ranking.daily_rank %>
+                          </span>
+                        </td>
+                        <td>
+                          <%= link_to ranking.track.name, track_path(ranking.track),
+                                      class: "has-text-link" %>
+                        </td>
+                        <td>
+                          <span class="has-text-grey">
+                            <%= ranking.track.artist.name %>
+                          </span>
+                        </td>
+                        <td>
+                          <span class="tag is-info is-small">
+                            <%= ranking.popularity %>
+                          </span>
+                        </td>
+                        <td class="has-text-grey">
+                          <%= ranking.snapshot_date.strftime("%b %d") %>
+                        </td>
+                      </tr>
+                    <% end %>
+                  </tbody>
+                </table>
+              </div>
+
+              <% if @country.daily_rankings.count > 50 %>
+                <div class="has-text-centered mt-4">
+                  <p class="is-size-7 has-text-grey">
+                    Showing latest 50 rankings out of <%= number_with_delimiter(@total_rankings) %> total
+                  </p>
+                </div>
+              <% end %>
+            <% else %>
+              <div class="has-text-centered has-text-grey py-5">
+                <span class="icon is-large">
+                  <i class="fas fa-chart-line"></i>
+                </span>
+                <p>No ranking data available for this country.</p>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+  <script>
+    var countryMap = null; // Global variable to store map instance
+
+function initializeCountryMap() {
+  var mapContainer = document.getElementById('country-map');
+  if (!mapContainer) return;
+
+  // Remove existing map if it exists
+  if (countryMap !== null) {
+    countryMap.remove();
+    countryMap = null;
+  }
+
+  // Initialize new map
+  countryMap = L.map('country-map').setView([<%= @latitude %>, <%= @longitude %>], 4);
+
+  // Add OpenStreetMap tiles
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(countryMap);
+
+  // Add marker for the country
+  var marker = L.marker([<%= @latitude %>, <%= @longitude %>])
+    .addTo(countryMap)
+    .bindPopup('<strong><%= @country.name %></strong><br>Music Rankings Available')
+    .openPopup();
+
+  // Force resize after a short delay
+  setTimeout(function() {
+    if (countryMap) {
+      countryMap.invalidateSize();
+    }
+  }, 100);
+}
+
+// Listen for both initial load and Turbo navigation
+document.addEventListener('DOMContentLoaded', initializeCountryMap);
+document.addEventListener('turbo:load', initializeCountryMap);
+
+// Clean up map before page is cached by Turbo
+document.addEventListener('turbo:before-cache', function() {
+  if (countryMap !== null) {
+    countryMap.remove();
+    countryMap = null;
+  }
+});
+  </script>

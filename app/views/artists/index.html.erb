@@ -3,7 +3,7 @@
   <div class="container">
     <h1 class="title">Artists</h1>
     <div class="columns is-multiline">
-      <% @artists.each do |track| %>
+      <% @artists.each do |artist| %>
         <div class="column is-one-quarter">
         <%= render partial: "artist", locals: { artist: artist } %>
         </div>

@@ -1,13 +1,284 @@
-
-<section class="section">
+<div class="section">
   <div class="container">
-    <h1 class="title">Tracks</h1>
-    <div class="columns is-multiline">
+    <!-- Header Section -->
+    <div class="hero is-primary is-medium">
+      <div class="hero-body">
+        <div class="container">
+          <h1 class="title is-1">
+            <span class="icon is-large">
+              <i class="fas fa-music"></i>
+            </span>
+            Music Tracks Database
+          </h1>
+          <h2 class="subtitle is-4">
+            Navigate and explore the complete music collection with detailed rankings and analytics
+          </h2>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="section">
+      <div class="columns is-multiline">
+        <div class="column is-3">
+          <div class="card has-background-info">
+            <div class="card-content has-text-white has-text-centered">
+              <p class="subtitle is-6 has-text-white">Total Tracks</p>
+              <p class="title is-2 has-text-white"><%= @tracks.total_count %></p>
+              <p class="subtitle is-6 has-text-white">Total Tracks</p>
+            </div>
+          </div>
+        </div>
+        <div class="column is-3">
+          <div class="card has-background-success">
+            <div class="card-content has-text-white has-text-centered">
+              <p class="title is-2 has-text-white"><%= @tracks_artistcount %></p>
+              <p class="subtitle is-6 has-text-white">Artists</p>
+            </div>
+          </div>
+        </div>
+        <div class="column is-3">
+          <div class="card has-background-warning">
+            <div class="card-content has-text-white has-text-centered">
+              <p class="title is-2 has-text-white"><%= @tracks_albumcount %></p>
+              <p class="subtitle is-6 has-text-white">Albums</p>
+            </div>
+          </div>
+        </div>
+        <div class="column is-3">
+          <div class="card has-background-danger">
+            <div class="card-content has-text-white has-text-centered">
+              <p class="subtitle is-6 has-text-white">Across</p>
+              <p class="title is-2 has-text-white"><%= Country.count %></p>
+              <p class="subtitle is-6 has-text-white">Countries</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search and Filter Controls -->
+    <div class="box">
+      <h3 class="title is-4">Search & Filter</h3>
+
+      <%= form_with url: tracks_path, method: :get, class: "form", local: true do |form| %>
+        <div class="field is-grouped is-grouped-multiline">
+          <div class="control has-icons-left is-expanded">
+            <%= form.text_field :search, value: params[:search], class: "input is-medium", placeholder: "Search tracks, artists, albums..." %>
+            <span class="icon is-small is-left">
+              <i class="fas fa-search"></i>
+            </span>
+          </div>
+        </div>
+
+        <div class="field is-grouped">
+          <div class="control">
+            <%= form.submit "Apply Filters", class: "button is-primary" %>
+          </div>
+          <div class="control">
+            <%= link_to "Clear", tracks_path, class: "button is-light" %>
+          </div>
+        </div>
+
+      <% end %>
+    </div>
+
+    <!-- Tracks Header -->
+    <div class="level">
+      <div class="level-left">
+        <div class="level-item">
+          <h3 class="title is-4">
+            <span class="icon">
+              <i class="fas fa-th-large"></i>
+            </span>
+            All Tracks
+          </h3>
+        </div>
+      </div>
+      <div class="level-right">
+        <div class="level-item">
+          <span class="tag is-info is-medium">
+            <%= @tracks.total_count %> total tracks
+            (<%= @tracks.current_page %> of <%= @tracks.total_pages %> pages)
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tracks Grid -->
+    <div class="columns is-multiline" id="tracksGrid">
       <% @tracks.each do |track| %>
-        <div class="column is-one-quarter">
-        <%= render partial: "track", locals: { track: track } %>
+        <div class="column is-4-desktop is-6-tablet is-12-mobile"
+             data-track-id="<%= track.id %>"
+             data-name="<%= track.name.downcase %>"
+             data-artist="<%= track.artist&.name&.downcase %>"
+             data-album="<%= track.album&.title&.downcase %>"
+             data-energy="<%= track.energy %>"
+             data-countries="<%= @track_country_counts[track.id] || 0 %>"
+             data-popularity="<%= track.daily_rankings.maximum(:popularity) || 0 %>">
+
+          <div class="card is-fullheight">
+            <header class="card-header">
+              <div class="card-header-title">
+                <div class="media is-fullwidth">
+                  <div class="media-content">
+                    <p class="title is-5 has-text-weight-bold">
+                      <span class="icon is-small has-text-primary">
+                        <i class="fas fa-music"></i>
+                      </span>
+                      <%= track.name %>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </header>
+
+            <div class="card-content">
+              <!-- Artist Information -->
+              <div class="field">
+                <label class="label is-small has-text-grey">Artist</label>
+                <% if track.artist %>
+                  <span class="tag is-info is-light">
+                    <span class="icon is-small">
+                      <i class="fas fa-user"></i>
+                    </span>
+                    <span><%= track.artist.name %></span>
+                  </span>
+                <% else %>
+                  <span class="has-text-grey">No artist</span>
+                <% end %>
+              </div>
+
+              <!-- Album Information -->
+              <div class="field">
+                <label class="label is-small has-text-grey">Album</label>
+                <% if track.album %>
+                  <div>
+                    <p class="has-text-weight-semibold is-size-6"><%= track.album.title %></p>
+                    <% if track.album.release_date %>
+                      <p class="is-size-7 has-text-grey">
+                        <span class="icon is-small">
+                          <i class="fas fa-calendar-alt"></i>
+                        </span>
+                        <%= track.album.release_date.year %>
+                      </p>
+                    <% end %>
+                  </div>
+                <% else %>
+                  <span class="has-text-grey">No album</span>
+                <% end %>
+              </div>
+
+              <!-- Audio Features -->
+              <div class="field">
+                <label class="label is-small has-text-grey">Audio Features</label>
+                <div class="tags">
+                  <% if track.energy %>
+                    <span class="tag is-success is-small">
+                      <span class="icon is-small">
+                        <i class="fas fa-bolt"></i>
+                      </span>
+                      <span>Energy: <%= (track.energy * 100).round %>%</span>
+                    </span>
+                  <% end %>
+                  <% if track.danceability %>
+                    <span class="tag is-warning is-small">
+                      <span class="icon is-small">
+                        <i class="fas fa-music"></i>
+                      </span>
+                      <span>Dance: <%= (track.danceability * 100).round %>%</span>
+                    </span>
+                  <% end %>
+                  <% if track.tempo %>
+                    <span class="tag is-info is-small">
+                      <span class="icon is-small">
+                        <i class="fas fa-tachometer-alt"></i>
+                      </span>
+                      <span><%= track.tempo.round %> BPM</span>
+                    </span>
+                  <% end %>
+                </div>
+              </div>
+
+              <!-- Countries and Popularity -->
+              <div class="columns is-mobile">
+                <div class="column">
+                  <label class="label is-small has-text-grey">Countries</label>
+                  <% country_count = @track_country_counts[track.id] || 0 %>
+                  <% if country_count > 0 %>
+                    <span class="tag is-primary is-medium">
+                      <span class="icon is-small">
+                        <i class="fas fa-globe"></i>
+                      </span>
+                      <span><%= country_count %></span>
+                    </span>
+                  <% else %>
+                    <span class="tag is-light">0</span>
+                  <% end %>
+                </div>
+
+                <div class="column">
+                  <label class="label is-small has-text-grey">Top Popularity</label>
+                  <% max_popularity = track.daily_rankings.maximum(:popularity) %>
+                  <% if max_popularity %>
+                    <div class="field">
+                      <progress class="progress is-info is-small" value="<%= max_popularity %>" max="100">
+                        <%= max_popularity %>%
+                      </progress>
+                      <p class="is-size-7 has-text-centered has-text-weight-semibold">
+                        <%= max_popularity %>%
+                      </p>
+                    </div>
+                  <% else %>
+                    <span class="has-text-grey">No data</span>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+
+            <footer class="card-footer">
+              <div class="card-footer-item">
+                <%= link_to track_path(track), class: "button is-info is-fullwidth" do %>
+                  <span class="icon">
+                    <i class="fas fa-eye"></i>
+                  </span>
+                  <span>View Details</span>
+                <% end %>
+              </div>
+            </footer>
+          </div>
         </div>
       <% end %>
     </div>
+
+    <!-- Empty State -->
+    <% if @tracks.empty? %>
+      <div class="has-text-centered py-6">
+        <div class="icon is-large has-text-grey-light">
+          <i class="fas fa-music fa-3x"></i>
+        </div>
+        <p class="title is-4 has-text-grey">No tracks found</p>
+        <p class="subtitle is-6 has-text-grey">Try adjusting your search criteria</p>
+      </div>
+    <% end %>
+
+    <!-- Pagination Info -->
+    <div class="level mt-5">
+      <div class="level-left">
+        <div class="level-item">
+          <p class="subtitle is-6">
+            Showing <%= @tracks.offset_value + 1 %>-<%= [@tracks.offset_value + @tracks.limit_value, @tracks.total_count].min %>
+            of <%= @tracks.total_count %> tracks
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Kaminari Pagination -->
+    <div class="has-text-centered">
+      <%= paginate @tracks,
+          nav_class: "pagination-list" %>
+    </div>
+
   </div>
-</section>
+</div>

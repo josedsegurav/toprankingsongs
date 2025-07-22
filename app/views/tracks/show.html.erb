@@ -1,28 +1,15 @@
-<div class="card">
-  <div class="card-header">
-    <p class="card-header-title is-size-5">
-      <%= @track.name %>
-    </p>
-  </div>
-
-  <div class="card-content">
-    <!-- Artist and Album Info -->
-    <div class="content mb-4">
-      <p class="has-text-weight-semibold is-size-6 mb-1">
+<section class="section">
+<div class="level-right">
+        <div class="level-item">
+          <%= link_to "← Back to Tracks", tracks_path, class: "button is-light" %>
+        </div>
+      </div>
+  <h1 class="title"><%= @track.name %></h1>
+  <h2 class="subtitle">
+    <%= @track.artist.name %>
+  </h2>
+  <p class="has-text-weight-semibold is-size-6 mb-1">
         <span class="icon-text">
-          <span class="icon">
-            <i class="fas fa-user"></i>
-          </span>
-          <span>Artist:</span>
-        </span>
-        <%= @track.artist.name %>
-      </p>
-
-      <p class="has-text-weight-semibold is-size-6 mb-1">
-        <span class="icon-text">
-          <span class="icon">
-            <i class="fas fa-compact-disc"></i>
-          </span>
           <span>Album:</span>
         </span>
         <%= @track.album.title %>
@@ -33,25 +20,18 @@
           Released: <%= @track.album.release_date.strftime("%B %d, %Y") %>
         </p>
       <% end %>
-    </div>
-
-    <!-- Spotify Player -->
-    <div class="mb-4">
+      <div class="mt-4 mb-4">
       <iframe
         style="border-radius:12px"
         src="https://open.spotify.com/embed/track/<%= @track.spotify_id %>?utm_source=generator"
-        width="50%"
+
         height="152"
-        frameBorder="0"
         allowfullscreen=""
         allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
         loading="lazy">
       </iframe>
     </div>
-
-    <!-- Track Details -->
-    <div class="content mb-4">
-      <p class="subtitle is-6 mb-2">
+    <p class="subtitle is-6 mb-2">
         <span class="icon-text">
           <span class="icon">
             <i class="fas fa-music"></i>
@@ -61,17 +41,31 @@
       </p>
 
       <div class="columns is-mobile is-multiline">
-        <div class="column is-half">
+        <div class="column is-one-quarter">
           <div class="field">
             <label class="label is-small">Duration</label>
             <p class="is-size-7"><%= Time.at(@track.duration_ms / 1000.0).utc.strftime("%M:%S") %></p>
           </div>
         </div>
 
-        <div class="column is-half">
+        <div class="column is-one-quarter">
           <div class="field">
             <label class="label is-small">Tempo</label>
             <p class="is-size-7"><%= @track.tempo.round(1) %> BPM</p>
+          </div>
+        </div>
+
+        <div class="column is-one-quarter">
+          <div class="field">
+            <label class="label is-small">Key</label>
+            <p class="is-size-7"><%= @track_key %> <%= @track_keymode %></p>
+          </div>
+        </div>
+
+        <div class="column is-one-quarter">
+          <div class="field">
+            <label class="label is-small">Time Signature</label>
+            <p class="is-size-7"><%= @track.time_signature %>/4</p>
           </div>
         </div>
 
@@ -93,36 +87,31 @@
           </div>
         </div>
       </div>
-    </div>
+      <p class="subtitle is-6 mb-3">
+  <span class="icon-text">
+    <span class="icon">
+      <i class="fas fa-globe"></i>
+    </span>
+    <span>Countries Ranking</span>
+  </span>
+</p>
 
-    <!-- Countries Ranking -->
-    <% if @track.daily_rankings.any? %>
-      <div class="content">
-        <p class="subtitle is-6 mb-3">
-          <span class="icon-text">
-            <span class="icon">
-              <i class="fas fa-globe"></i>
-            </span>
-            <span>Countries Ranking</span>
-          </span>
-        </p>
+<div class="tags">
+  <% @track.daily_rankings.group_by(&:country).each do |country, rankings| %>
+    <% latest_ranking = rankings.max_by(&:snapshot_date) %>
+    <%= link_to country_path(country), class: "tag is-link is-light is-medium",
+                style: "text-decoration: none;" do %>
+      <span class="icon">
+        <i class="fas fa-flag"></i>
+      </span>
+      <span>
+        <%= country.name %>
+        <strong>#<%= latest_ranking.daily_rank %></strong>
+      </span>
+    <% end %>
+  <% end %>
+</div>
 
-        <div class="tags">
-          <% @track.daily_rankings.group_by(&:country).each do |country, rankings| %>
-            <% latest_ranking = rankings.max_by(&:snapshot_date) %>
-            <span class="tag is-link is-light is-medium">
-              <span class="icon">
-                <i class="fas fa-flag"></i>
-              </span>
-              <span>
-                <%= country.name %>
-                <strong>#<%= latest_ranking.daily_rank %></strong>
-              </span>
-            </span>
-          <% end %>
-        </div>
-
-        <!-- Detailed Rankings (expandable) -->
         <details class="mt-3">
           <summary class="has-text-link is-size-7 mb-2">Show detailed rankings</summary>
           <div class="table-container">
@@ -161,11 +150,5 @@
             </table>
           </div>
         </details>
-      </div>
-    <% else %>
-      <div class="notification is-light">
-        <p class="is-size-7">No ranking data available for this @track.</p>
-      </div>
-    <% end %>
-  </div>
-</div>
+</section>
+

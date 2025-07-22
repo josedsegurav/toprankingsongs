@@ -8,24 +8,19 @@
   <div class="card-content">
     <div class="content mb-4">
       <p class="has-text-weight-semibold is-size-6 mb-1">
-        <span class="icon-text">
-          <span>Artist:</span>
-        </span>
-        <%= artist.name %>
+          <span>Albums:</span>
+          <% artist.albums.each do |album| %>
+        <p class="tag is-light mr-1 mb-1"><%= album.title %></p>
+        <% end %>
       </p>
 
       <p class="has-text-weight-semibold is-size-6 mb-1">
-        <span class="icon-text">
+
           <span>Album:</span>
-        </span>
-        <%= track.album.title %>
+
+        <%=  %>
       </p>
 
-      <% if track.album.release_date %>
-        <p class="has-text-grey is-size-7">
-          Released: <%= track.album.release_date.strftime("%B %d, %Y") %>
-        </p>
-      <% end %>
     </div>
 
   </div>

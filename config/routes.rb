@@ -11,7 +11,8 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "posts#index"
-  get "tracks/index"
-  get "tracks" => "tracks#index", as: :tracks
-  get "tracks/:id" => "tracks#show", as: :track
+  resources :tracks
+  resources :artists
+  resources :countries, only: [:index, :show]
+
 end
